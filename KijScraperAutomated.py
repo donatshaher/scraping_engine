@@ -1,9 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-all these packages included with standard library - need python to run this
-so, just having a python distribution means can import these
-all pip installed libraries are saved to ext lib folders?!
+
 
 want for this to prompt me to input starting url in console or form
 then I input it, script runs and output is list of shit. Also pick numbers,
@@ -143,7 +141,8 @@ class scraper(object):
         page_items = page_soup_iter.findAll("div", {"data-listing-id": re.compile('.*')})
 
         # CHANGE NUMBER HERE!!!!!
-        for item in page_items[0:self.items]:
+        for item in page_items[0:len(page_items)]:
+        #for item in page_items[0:self.items]:
             sleep(randint(1, 5))
 
             # get the url - have it
@@ -210,13 +209,13 @@ class scraper(object):
 
 
 #"https://www.kijiji.ca/b-for-rent/gta-greater-toronto-area/c30349001l1700272"
-url_input = input("Please enter starting url: ")
+url_input = input("Please enter starting kijiji url in format https://www.website.com: ")
 pages_input = input("Please enter number of pages you want to parse: ")
-items_input = input("Please enter number of items per page to parse: ")
-#max_price_input = input("max price?: ")
+max_recency = input("Please enter, in -number of days old-, the oldest ad you will tolerate: ")
+
 
 #
-inst = scraper(pages=int(pages_input), items=int(items_input)).interface(url_input)
+inst = scraper(pages=int(pages_input), items=10).interface(url_input)
 
 
 
@@ -247,26 +246,31 @@ df = makeDf(inst)
 
 # udf to get time
 def time_elapsed(t):
-    x = datetime.datetime.strptime(t, '%Y-%m-%dT%H:%M:%S.000Z')
 
-    y = datetime.datetime.today()
+    try:
 
-    z = y - x
+        # grab UTC time kijiji
+        x = datetime.datetime.strptime(t, '%Y-%m-%dT%H:%M:%S.000Z')
 
-    return z.days + (z.seconds / 60 / 60 / 24)
+        # convert to toronto
+        x_toronto = x - datetime.timedelta(hours=5, minutes=00)
 
-# clean out the price and restrict df by the price
-#var = '$700.00'
-#print(float(var[1:]))
+        y = datetime.datetime.today()
 
-#clean price and convert to number
+        z = y - x_toronto
+
+        return z.days + (z.seconds / 60 / 60 / 24)
+
+    except:
+
+        return None
 
 
-#filter price
 
 
 
-# replace nan with 0
+# replace nan with 0 --> assumption is null is 0 --> questionable  ....
+# see if older ads have 0's ever
 df['visits'] = df['visits'].replace([np.nan], '0')
 
 # prep visits for numeric
@@ -275,14 +279,21 @@ df['visits'] = df['visits'].astype(str).apply(lambda x: x.replace(',', '') if x 
 # to numeric
 df["visits"] = pd.to_numeric(df["visits"])
 
-# modify dates to time since posted
+# modify dates to time since posted - else null (nulls removed)
 df['days'] = df['timestamp'].map(time_elapsed)
+
+# remove nulls timestamps
+df = df.dropna(axis=0, subset=['days'])
 
 # get rank
 df['rank'] = df['visits'] / df['days']
 df = df.sort_values(by=['rank'], ascending=False)
-#print(df)
-#df.columns
+
+
+
+#filter date
+df = df.loc[df['days'] < int(max_recency)]
+
 
 # to array
 array_urls = df[['url']].to_numpy()
@@ -293,7 +304,3 @@ for a, r in zip(array_urls, array_ranks):
     print(a)
 
 
-
-    
-    
-    
