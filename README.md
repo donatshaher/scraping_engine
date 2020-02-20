@@ -5,7 +5,8 @@ An automated housing classifieds scraper which finds the hottest deals. Kijiji n
 How do we define hottest deals? hotness rank = "visits / time elapsed since ad was posted"
 
 
-THE PROCESS
+THE PROCESS:
+
 All you have to provide is the starting search URL - by starting URL I mean say that you searched for "apartments in Toronto" -  the resultant search query will be the starting search URL. This is where you do all the filtering on kijiji (ex: price = x, location=y, etc). kijiji URL will incorporate all of these filtering options.
 
 Then, you also provide number of pages you want to iterate and the oldest ad you're willing to tolerate. Then the script outputs a list of listings and their ranks. The higher the rank of the listing, the 'hotter" it is'.
