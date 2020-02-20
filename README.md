@@ -1,5 +1,6 @@
 # scraping_engine
 
+
 An automated housing classifieds scraper which finds the hottest deals. Kijiji never surfaces hottest deals - so this script finds them for you. 
 
 How do we define hottest deals? hotness rank = "visits / time elapsed since ad was posted"
@@ -19,3 +20,10 @@ HOW IS IT IMPLEMENTED?
 Kijiji has a metric called "visits" for each ad. To find the most popular items for your search query (which might return 1000s of results)- you'd have to go through on very item for page 1,2,3, etc. Then you'd have to look at visits and tiemstamp of each ad. Then compare all of them.
 
 Instead, the scraper will do this and scrape all items on all corresponding pages, calculate a "hotness" metric, which is "visits / time elapsed since ad was posted". Then it will sort the listings from hottest to least hot.
+
+
+
+
+sidenote 1: Make sure you have all imported python packages pip installed prior to running script
+sidenote 2: The script runs a bit slower due to random timeouts built in - it's on purpose to make sure that scraping isn't detected as a bot interaction by kijiji systems
+
